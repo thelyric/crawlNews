@@ -58,8 +58,8 @@ var newsCategory = []Category{
 		Path: "the-gioi.rss",
 	},
 	{
-		Name: "Kinh doanh",
-		Path: "kinh-doanh.rss",
+		Name: "Sức khoẻ",
+		Path: "suc-khoe.rss",
 	},
 	{
 		Name: "Giải trí",
@@ -103,7 +103,7 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 				defer wg.Done()
 
 				base, _ := url.Parse(sourceURL)
-				rel, _ := url.Parse(category)
+				rel, _ := url.Parse(catPath)
 				fullURL := base.ResolveReference(rel).String()
 				feed, err := parser.ParseURLWithContext(fullURL, ctx)
 
