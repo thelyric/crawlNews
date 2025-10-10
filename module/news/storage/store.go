@@ -5,6 +5,8 @@ import (
 	"my-app/common"
 	newsmodel "my-app/module/news/model"
 	"net/url"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -73,6 +75,21 @@ func NewNewsStore() *store {
 	return &store{}
 }
 
+func ExtractImage(description string) string {
+	// Bỏ CDATA nếu có
+	desc := strings.TrimSpace(description)
+	desc = strings.ReplaceAll(desc, "<![CDATA[", "")
+	desc = strings.ReplaceAll(desc, "]]>", "")
+
+	// Regex tìm ảnh
+	re := regexp.MustCompile(`<img[^>]+src=["']([^"']+)["']`)
+	matches := re.FindStringSubmatch(desc)
+	if len(matches) > 1 {
+		return matches[1] // group 1 là URL ảnh
+	}
+	return ""
+}
+
 func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) ([]newsmodel.Article, error) {
 	parser := gofeed.NewParser()
 
@@ -85,8 +102,8 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 			go func(sourceName, sourceURL, category, catPath string) {
 				defer wg.Done()
 
-				base, _ := url.Parse("https://tuoitre.vn/rss/")
-				rel, _ := url.Parse("kinh-doanh.rss")
+				base, _ := url.Parse(sourceURL)
+				rel, _ := url.Parse(category)
 				fullURL := base.ResolveReference(rel).String()
 				feed, err := parser.ParseURLWithContext(fullURL, ctx)
 
@@ -99,7 +116,11 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 					if i >= data.Limit {
 						break
 					}
+
+					imageURL := ExtractImage(item.Description)
+
 					articles = append(articles, newsmodel.Article{
+						Avatar:      imageURL,
 						Title:       item.Title,
 						Link:        item.Link,
 						PublishedAt: item.Published,
