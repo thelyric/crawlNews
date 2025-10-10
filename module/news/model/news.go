@@ -1,6 +1,7 @@
 package newsmodel
 
 type Article struct {
+	Avatar      string `json:"avatar"`
 	Title       string `json:"title"`
 	Link        string `json:"link"`
 	PublishedAt string `json:"published_at"`
