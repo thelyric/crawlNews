@@ -2,7 +2,6 @@ package newsstorage
 
 import (
 	"context"
-	"my-app/common"
 	newsmodel "my-app/module/news/model"
 	"net/url"
 	"regexp"
@@ -108,8 +107,9 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 				feed, err := parser.ParseURLWithContext(fullURL, ctx)
 
 				if err != nil {
-					panic(common.NewStorageErrorResponse(err))
+					return
 				}
+
 				articles := []newsmodel.Article{}
 
 				for i, item := range feed.Items {
@@ -118,7 +118,6 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 					}
 
 					imageURL := ExtractImage(item.Description)
-
 					articles = append(articles, newsmodel.Article{
 						Avatar:      imageURL,
 						Title:       item.Title,
