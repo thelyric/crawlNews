@@ -2,6 +2,7 @@ package newsstorage
 
 import (
 	"context"
+	"html"
 	newsmodel "my-app/module/news/model"
 	"net/url"
 	"regexp"
@@ -120,7 +121,7 @@ func (s store) FetchLatestNews(ctx context.Context, data *newsmodel.GetArticle) 
 					imageURL := ExtractImage(item.Description)
 					articles = append(articles, newsmodel.Article{
 						Avatar:      imageURL,
-						Title:       item.Title,
+						Title:       html.UnescapeString(item.Title),
 						Link:        item.Link,
 						PublishedAt: item.Published,
 						Category:    category,
