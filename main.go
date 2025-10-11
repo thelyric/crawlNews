@@ -22,6 +22,8 @@ func main() {
 
 	// gin start
 	r := gin.Default()
+	r.Use(middleware.CORS())
+
 	r.Use(middleware.Recover())
 	r.Static("/static", "./static")
 
@@ -44,8 +46,7 @@ func main() {
 	// restaurantRoute.POST("", ginrestaurant.CreateRestaurant(appContext))
 	// restaurantRoute.DELETE("/:id", ginrestaurant.DeleteRestaurant(appContext))
 
-	port := "8080"
-	r.Run(":" + port)
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 	// defer db.CloseDB(gormDB)
 }
